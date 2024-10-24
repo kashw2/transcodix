@@ -36,7 +36,7 @@ in
       path = [ pkgs.inotify-tools pkgs.handbrake pkgs.bash pkgs.ffmpeg ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.bash}/bin/bash ${./transcoder.sh} ${cfg.watchDirectory} ${cfg.outputDirectory} ${cfg.watchExtension} ${cfg.transcodingPackage}";
+        ExecStart = "${pkgs.bash}/bin/bash ${./transcoder.sh} ${cfg.watchDirectory} ${cfg.watchExtension} ${cfg.outputDirectory} ${cfg.transcodingPackage}";
         Restart = "always";
         RestartSec = "10s";
       };
