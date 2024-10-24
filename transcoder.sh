@@ -15,12 +15,12 @@ process_file() {
   echo "Processing: $file"
 
   # Determine method to use
-  if [ $TRANSCODING_PACKAGE == "handbrake" ]; then
-    echo "Using HandBrakeCLI"
-    process_file_with_handbrake "$file" "$output_file"
-  else
+  if [ $TRANSCODING_PACKAGE == "ffmpeg" ]; then
     echo "Using ffmpeg"
     process_file_with_ffmpeg "$file" "$output_file"
+  else
+    echo "Using HandBrakeCLI"
+    process_file_with_handbrake "$file" "$output_file"
   fi
 
   # Output completion status
