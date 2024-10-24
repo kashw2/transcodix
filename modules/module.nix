@@ -10,7 +10,7 @@ in
 
     watchDirectory = lib.mkOption {
       type = lib.types.str;
-      default = "${config.users.users.keanu.home}/Downloads";
+      example = "/home/user/Downloads";
     };
 
     watchExtension = lib.mkOption {
@@ -19,7 +19,7 @@ in
 
     outputDirectory = lib.mkOption {
       type = lib.types.str;
-      default = "${config.users.users.keanu.home}/Downloads";
+      example = "/home/user/Downloads";
     };
 
     transcodingPackage = lib.mkOption {
