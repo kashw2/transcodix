@@ -1,9 +1,14 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.services.transcodix;
 in
 {
-  imports = [];
+  imports = [ ];
 
   options.services.transcodix = {
     enable = lib.mkEnableOption "transcodix";
@@ -14,7 +19,12 @@ in
     };
 
     watchExtension = lib.mkOption {
-      type = lib.types.either lib.types.str (lib.types.enum [ "mkv" "avi" ]);
+      type = lib.types.either lib.types.str (
+        lib.types.enum [
+          "mkv"
+          "avi"
+        ]
+      );
     };
 
     outputDirectory = lib.mkOption {
@@ -23,7 +33,12 @@ in
     };
 
     transcodingPackage = lib.mkOption {
-      type = lib.types.either lib.types.str (lib.types.enum [ "handbrake" "ffmpeg" ]);
+      type = lib.types.either lib.types.str (
+        lib.types.enum [
+          "handbrake"
+          "ffmpeg"
+        ]
+      );
       default = "handbrake";
       example = "ffmpeg";
     };
