@@ -11,14 +11,16 @@ echo "Using ${TRANSCODING_PACKAGE}"
 
 process_file() {
   local file="$1"
-  local output_file="${OUTPUT_DIRECTORY}/$(basename "$file" .${WATCH_EXTENSION})"
+  local output_file="${OUTPUT_DIRECTORY}/$(basename "$file" .${WATCH_EXTENSION}).mp4"
   echo "Processing: $file"
 
   # Determine method to use
   if [ $TRANSCODING_PACKAGE == "handbrake" ]; then
     echo "Using HandBrakeCLI"
+    process_file_with_handbrake "$file" "$output_file"
   else
     echo "Using ffmpeg"
+    process_file_with_ffmpeg "$file" "$output_file"
   fi
 
   # Output completion status
