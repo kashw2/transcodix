@@ -12,6 +12,6 @@
     }:
     {
       nixosModules.default = self.nixosModule.transcodix;
-      nixosModules.transcodix.imports = [ ./module/module.nix ];
+      nixosModules.transcodix.imports = [ ./modules/module.nix ];
     };
 }
