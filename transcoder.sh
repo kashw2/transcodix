@@ -16,10 +16,8 @@ process_file() {
 
   # Determine method to use
   if [ $TRANSCODING_PACKAGE == "ffmpeg" ]; then
-    echo "Using ffmpeg"
     process_file_with_ffmpeg "$file" "$output_file"
   else
-    echo "Using HandBrakeCLI"
     process_file_with_handbrake "$file" "$output_file"
   fi
 
