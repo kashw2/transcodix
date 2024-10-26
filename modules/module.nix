@@ -33,9 +33,15 @@ in
     };
 
     user = lib.mkOption {
-        type = lib.types.str;
-        default = "transcodix";
-        example = "kashw2";
+      type = lib.types.str;
+      default = "transcodix";
+      example = "kashw2";
+    };
+
+    group = lib.mkOption {
+      type = lib.types.str;
+      default = "transcodix";
+      example = "wheel";
     };
 
     transcodingPackage = lib.mkOption {
@@ -54,7 +60,12 @@ in
     systemd.services.transcodix = {
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = [ pkgs.inotify-tools pkgs.handbrake pkgs.bash pkgs.ffmpeg ];
+      path = [
+        pkgs.inotify-tools
+        pkgs.handbrake
+        pkgs.bash
+        pkgs.ffmpeg
+      ];
 
       serviceConfig = {
         ExecStart = "${pkgs.bash}/bin/bash ${../transcoder.sh} ${cfg.watchDirectory} ${cfg.watchExtension} ${cfg.outputDirectory} ${cfg.transcodingPackage}";
@@ -63,9 +74,15 @@ in
       };
     };
 
-    users.users.${cfg.user} = lib.mkIf cfg.user != "" {
-        description = "System user for the transcodix instance";
-        isSystemUser = true;
+    users.users.${cfg.user} = {
+      description = "System user for the transcodix instance";
+      group = cfg.group;
+      isSystemUser = true;
+    };
+
+    users.groups.${cfg.group} = {
+      name = cfg.group;
+      members = if cfg.user != "" then [ cfg.user ] else [ ];
     };
   };
 }
