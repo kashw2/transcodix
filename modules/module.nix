@@ -60,11 +60,9 @@ in
     systemd.services.transcodix = {
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = [
+      path = (if cfg.transcodingPackage == "handbrake" then [ pkgs.handbrake ] else [ pkgs.ffmpeg ]) ++ [
         pkgs.inotify-tools
-        pkgs.handbrake
         pkgs.bash
-        pkgs.ffmpeg
       ];
 
       serviceConfig = {
