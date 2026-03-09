@@ -10,8 +10,31 @@
       self,
       nixpkgs,
     }:
+    let
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+    in
     {
-      nixosModules.default = self.nixosModule.transcodix;
-      nixosModules.transcodix.imports = [ ./modules/module.nix ];
+      nixosModules.default = self.nixosModules.transcodix;
+      nixosModules.transcodix.imports = [ ./module.nix ];
+
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = import ./package.nix {
+            inherit pkgs;
+            watchDirectory = "/tmp/transcodix/watch";
+            watchExtension = "mkv";
+            outputDirectory = "/tmp/transcodix/output";
+            transcodingPackage = "handbrake";
+          };
+        }
+      );
     };
 }

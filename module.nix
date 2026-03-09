@@ -6,69 +6,82 @@
 }:
 let
   cfg = config.services.transcodix;
+
+  transcoderScript = import ./package.nix {
+    inherit pkgs;
+    inherit (cfg)
+      watchDirectory
+      watchExtension
+      outputDirectory
+      transcodingPackage
+      ;
+  };
 in
 {
-  imports = [ ];
-
   options.services.transcodix = {
     enable = lib.mkEnableOption "transcodix";
 
     watchDirectory = lib.mkOption {
-      type = lib.types.str;
+      type = lib.types.nonEmptyStr;
+      description = "Directory to watch for new files to transcode.";
       example = "/home/user/Downloads";
     };
 
     watchExtension = lib.mkOption {
-      type = lib.types.either lib.types.str (
-        lib.types.enum [
-          "mkv"
-          "avi"
-        ]
-      );
+      type = lib.types.nonEmptyStr;
+      description = "File extension to watch for (e.g. mkv, avi).";
+      example = "mkv";
     };
 
     outputDirectory = lib.mkOption {
-      type = lib.types.str;
+      type = lib.types.nonEmptyStr;
+      description = "Directory to write transcoded files to.";
       example = "/home/user/Downloads";
     };
 
     user = lib.mkOption {
       type = lib.types.str;
       default = "transcodix";
+      description = "User account under which transcodix runs.";
       example = "kashw2";
     };
 
     group = lib.mkOption {
       type = lib.types.str;
       default = "transcodix";
+      description = "Group under which transcodix runs.";
       example = "wheel";
     };
 
     transcodingPackage = lib.mkOption {
-      type = lib.types.either lib.types.str (
-        lib.types.enum [
-          "handbrake"
-          "ffmpeg"
-        ]
-      );
+      type = lib.types.enum [
+        "handbrake"
+        "ffmpeg"
+      ];
       default = "handbrake";
+      description = "Transcoding backend to use.";
       example = "ffmpeg";
     };
   };
 
   config = lib.mkIf cfg.enable {
     systemd.services.transcodix = {
-      after = [ "network.target" ];
+      description = "Transcodix - file transcoding service";
+      after = [ "local-fs.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = (if cfg.transcodingPackage == "handbrake" then [ pkgs.handbrake ] else [ pkgs.ffmpeg ]) ++ [
-        pkgs.inotify-tools
-        pkgs.bash
-      ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.bash}/bin/bash ${../transcoder.sh} ${cfg.watchDirectory} ${cfg.watchExtension} ${cfg.outputDirectory} ${cfg.transcodingPackage}";
+        ExecStart = "${transcoderScript}/bin/transcodix";
         Restart = "always";
         RestartSec = "10s";
+        User = cfg.user;
+        Group = cfg.group;
+        NoNewPrivileges = true;
+        ProtectSystem = "strict";
+        ProtectHome = "read-only";
+        PrivateTmp = true;
+        ReadWritePaths = [ cfg.outputDirectory ];
+        ReadOnlyPaths = [ cfg.watchDirectory ];
       };
     };
 
